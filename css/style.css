@@ -1,0 +1,30 @@
+body{
+}
+
+section > *{
+  display:inline-block;
+/*  vertical-align:top;
+*/}
+.halfcourt{
+  height:580px;
+  width:390px;
+  border:1px solid red;
+  vertical-align: bottom;
+  /*background:red;*/
+}
+
+#court{
+  padding-top:10px;
+  padding-bottom:10px;
+  width:800px;
+  height:600px;
+  border:0px solid black;
+  background:url('../img/pikucanvas-web.jpg');
+}
+
+#p1,#p2{
+  width:120px;
+}
+#pokeball{
+  width:80px;
+}
