@@ -33,18 +33,18 @@ $(function(){
   };
 
   $("#p1").offset({
-    top: maxY - 300,
-    left: 100
+    top: maxY - 200,
+    left: 300
   });
 
   function rules(){
     var playerPos = $("#p1").offset();
     var ballPos = $("#pika").offset();
 
-    if (pika.x<=0 || pika.x >= maxX){
+    if (pika.x <= 0 || pika.x >= maxX){
       pika.Vx = pika.Vx * -1;
     };
-    if (pika.y == 0 || pika.y >= maxY){
+    if (pika.y <= 0 || pika.y >= maxY){
       pika.Vy = pika.Vy * -1;
     };
 
@@ -52,8 +52,8 @@ $(function(){
       pika.Vx = pika.Vx * -1;
       pika.Vy = pika.Vy * -1;
     }
-    // embed custom global event *if keydown (return)
 
+    // embed custom global event *if keydown (return)
     pika.x = pika.x + pika.Vx * dt;
     pika.y = pika.y + pika.Vy * dt;
 
@@ -120,7 +120,6 @@ $(function(){
 
   function trajectory(){
     t+=0.25;
-    console.log("V0 " + pika.Vx + " " + pika.Vy);
     pika.x = pika.x_0 + pika.Vx * t;
     pika.y = pika.y_0 + pika.Vy * t + 0.5 * g * t * t;
     $("#pika").offset({
@@ -128,14 +127,37 @@ $(function(){
       top:pika.y
     });
 
-    // console.log(pika.x, pika.y);
-
-    if (t>10){ // tbc to event hitting another target
+    if (checkGround($("#pika").offset())){
+      clearInterval(trajTimer);
+    };
+    if(checkBoundary($("#pika").offset())){
       clearInterval(trajTimer);
       t = 0;
-      pika.up=false;
+      pika.Vx = pika.Vx * 0.2;
+      pika.Vy = pika.Vy * 0.2;
+      setNewBounceTimer();
     }
 
+    if (t>20){ // tbc to event hitting another target
+      clearInterval(trajTimer);
+      t = 0;
+      // pika.up=false;
+    }
+  }
+
+  function checkGround(ballPos){
+    return ballPos.top >= maxY ? true : false
+  }
+
+  function checkBoundary(ballPos){
+    if (ballPos.left<= 0 || ballPos.left >= maxX){
+      pika.Vx = pika.Vx * -1;
+      return true;
+    };
+    if (ballPos.top <= 0 || ballPos.top >= maxY){
+      pika.Vy = pika.Vy * -1;
+      return true;
+    }
   }
 
   function update(x,y){
@@ -145,8 +167,44 @@ $(function(){
     });
   }
 
+  function rulesNew(){
+    var playerPos = $("#p1").offset();
+    var ballPos = $("#pika").offset();
+
+    if (pika.x<=0){
+        pika.Vx = pika.Vx * -1;
+        pika.x += 5;
+    }else if(pika.x >= maxX){
+        pika.Vx = pika.Vx * -1;
+        pika.x -=5;
+    };
+    if (pika.y <= 0){
+        pika.Vy = pika.Vy * -1;
+        pika.y +=5
+    }else if(pika.y >= maxY){
+        pika.Vy = pika.Vy * -1;
+        pika.y = pika.y - 5;
+    };
+
+    if (hitRadius(maxRadius,playerPos,ballPos)){
+      pika.Vx = pika.Vx * -1;
+      pika.Vy = pika.Vy * -1;
+    }
+
+    // embed custom global event *if keydown (return)
+    pika.x = pika.x + pika.Vx * dt;
+    pika.y = pika.y + pika.Vy * dt;
+
+    update(pika.x,pika.y);
+  }
+
+
   function setBounceTimer(){
     ballTimer = setInterval(rules,10);
+  }
+
+  function setNewBounceTimer(){
+    ballTimer = setInterval(rulesNew,10);
   }
 
   function setTrajTimer(){ // Start Interval of Trajectory
@@ -157,10 +215,11 @@ $(function(){
 
   $(document).keydown(function(e){
     //if return (keycode=13)
-    if (e.which == 13) {
+    if (e.which == 13 && pika.exc == false) {
+        pika.exc = true;
       if(hitRadius(150,$("#p1").offset(),$("#pika").offset())){
         console.log("HIT by Return!!!");
-        console.log($("#pika").offset());
+        console.log("At: x=" + $("#pika").offset().left + " y=" + $("#pika").offset().top);
         clearInterval(ballTimer);
 
         initTraj(pika, computeXY.x, computeXY.y);
@@ -170,6 +229,7 @@ $(function(){
         // //computeXY
         setTrajTimer();
       }
+      pika.exc = false;
 
       // if(pika.stop == false){
       //   console.log("X = " + pika.x + " Y = " + pika.y);
@@ -185,9 +245,16 @@ $(function(){
       //   setBounceTimer();
       // };
     };
+    if (e.which == 38){
+      var playerPos = $("#p1").offset();
+      $("#p1").offset({
+        top: playerPos.top -10
+      })
+    };
 
     var p1Pos = $("#p1").offset();
     if(e.which == 38){
+
     }
   });
 
