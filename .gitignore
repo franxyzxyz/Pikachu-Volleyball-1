@@ -1,1 +1,5 @@
 .DS_Store
+js/bouncingEnv_test.js
+requestAnimFrame.js
+motion.js
+app_additional.js

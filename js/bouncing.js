@@ -45,6 +45,8 @@ $(function(){
       pika.Vx = pika.Vx * -1;
       pika.Vy = pika.Vy * -1;
     }
+    // embed custom global event *if keydown (return)
+    //
 
     pika.x = pika.x + pika.Vx * dt;
     pika.y = pika.y + pika.Vy * dt;
@@ -113,7 +115,6 @@ $(function(){
     });
   }
 
-
   function setTimer(){
     ballTimer = setInterval(rules,10);
   }
@@ -123,6 +124,11 @@ $(function(){
   $(document).keydown(function(e){
     //if return (keycode=13)
     if (e.which == 13) {
+      var playerPos = $("#p1").offset();
+      var ballPos = $("#pika").offset();
+      }
+
+
       if(pika.stop == false){
         console.log("X = " + pika.x + " Y = " + pika.y);
         clearInterval(ballTimer);
