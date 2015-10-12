@@ -1,11 +1,13 @@
 $(function(){
   var ballTimer;
   var trajTimer;
+  var jumpUp;
   var dt = 1;
   var maxX = 800;
   var maxY = 600;
-  var g = 5;
+  // var g = 5;
   var t = 0;
+  var t_p = 0;
 
   var maxRadius = 80;
   var playerWidth = $("#p1").width();
@@ -15,8 +17,6 @@ $(function(){
   var ballPos = $("#pika").offset();
   var radius = 0;
   var computeXY = {x:0,y:0};
-
-  var count = 0;
 
   var pika = {
     x:0,
@@ -29,13 +29,28 @@ $(function(){
     x_0: 0, // traj: inital x
     y_0: 0, // traj: intial y
     V0: 100, // traj: inital velocity
-    angle: 0
+    angle: 0,
+    g : 5
   };
 
   $("#p1").offset({
-    top: maxY - 200,
+    top: maxY - 100,
     left: 300
   });
+
+  var p1 = {
+    x_0 : $("#p1").offset().left,
+    y_0 : $("#p1").offset().top,
+    Vx : 0,
+    Vy : -100,
+    up : false, // traj
+    exc : false, // traj
+    g : 15,
+    x : 0,
+    y : 0
+  };
+
+
 
   function rules(){
     var playerPos = $("#p1").offset();
@@ -59,14 +74,6 @@ $(function(){
 
     update(pika.x,pika.y);
   }
-
-
-  var p1 = {
-    x: 0, y:0
-  };
-  var p2 = {
-    x: 0, y:0
-  };
 
   function unifyPlayer(playerName){ //adjust the reference point
     var tmp = $("#" + playerName);
@@ -118,43 +125,50 @@ $(function(){
     };
   };
 
-  function trajectory(){
+  function trajectory(){ // simulate ball trajectory motion
     t+=0.25;
     pika.x = pika.x_0 + pika.Vx * t;
-    pika.y = pika.y_0 + pika.Vy * t + 0.5 * g * t * t;
-    $("#pika").offset({
-      left:pika.x,
-      top:pika.y
-    });
+    pika.y = pika.y_0 + pika.Vy * t + 0.5 * pika.g * t * t;
+    update(pika.x,pika.y);
 
-    if (checkGround($("#pika").offset())){
+    if (checkGround(pika)){
       clearInterval(trajTimer);
     };
-    if(checkBoundary($("#pika").offset())){
+    if(checkBoundary(pika)){
       clearInterval(trajTimer);
       t = 0;
       pika.Vx = pika.Vx * 0.2;
       pika.Vy = pika.Vy * 0.2;
       setNewBounceTimer();
     }
+  }
 
-    if (t>20){ // tbc to event hitting another target
-      clearInterval(trajTimer);
-      t = 0;
-      // pika.up=false;
+  function trajectoryPlayer(){ // simulate JUMP of player
+    t_p+=0.25;
+    p1.x = p1.x_0 + p1.Vx * t_p;
+    p1.y = p1.y_0 + p1.Vy * t_p + 0.5 * p1.g * t_p * t_p;
+    $("#p1").offset({
+      left:p1.x,
+      top:p1.y
+    });
+
+    if (p1.y > maxY-120){
+      clearInterval(jumpUp);
+      t_p = 0;
+      p1.up=false;
     }
   }
 
   function checkGround(ballPos){
-    return ballPos.top >= maxY ? true : false
+    return ballPos.y >= maxY ? true : false
   }
 
   function checkBoundary(ballPos){
-    if (ballPos.left<= 0 || ballPos.left >= maxX){
+    if (ballPos.x<= 0 || ballPos.x >= maxX){
       pika.Vx = pika.Vx * -1;
       return true;
     };
-    if (ballPos.top <= 0 || ballPos.top >= maxY){
+    if (ballPos.y <= 0 || ballPos.y >= maxY){
       pika.Vy = pika.Vy * -1;
       return true;
     }
@@ -211,6 +225,13 @@ $(function(){
     trajTimer = setInterval(trajectory, 10);
   }
 
+  function jumpEvent(){
+    p1.x_0 = $("#p1").offset().left;
+    p1.y_0 = $("#p1").offset().top;
+    jumpUp = setInterval(trajectoryPlayer, 10);
+  }
+
+
   setBounceTimer();
 
   $(document).keydown(function(e){
@@ -224,9 +245,6 @@ $(function(){
 
         initTraj(pika, computeXY.x, computeXY.y);
 
-        // pika.x_0 = pika.x;
-        // pika.y_0 = pika.y;
-        // //computeXY
         setTrajTimer();
       }
       pika.exc = false;
@@ -245,17 +263,29 @@ $(function(){
       //   setBounceTimer();
       // };
     };
-    if (e.which == 38){
-      var playerPos = $("#p1").offset();
+    if (e.which == 37){
       $("#p1").offset({
-        top: playerPos.top -10
+        left: $("#p1").offset().left - 20
       })
     };
 
-    var p1Pos = $("#p1").offset();
-    if(e.which == 38){
-
+    if (e.which == 39){
+      $("#p1").offset({
+        left: $("#p1").offset().left + 20
+      })
     }
+
+    if (e.which == 32){
+      clearInterval(ballTimer);
+      clearInterval(trajTimer);
+
+    };
+
+    if (e.which == 38 && p1.up == false){ //  && p1.up == false
+      p1.up = true;
+      jumpEvent();
+    };
+
   });
 
 });
