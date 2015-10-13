@@ -7,7 +7,7 @@ $(function(){
   var ballPos = $("#pokeball").offset();
 
   var p1Pos = $("#p1").offset();
-  var p1Default = $("#player1").offset();
+  var p1Default = $("#player1").offset(); // [CHANGE LATER] for testing purpose
   var playerSize = $("#p1").width();//<-tbc: game.js define
   var canvas = $("#court").offset();
 
