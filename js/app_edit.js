@@ -74,7 +74,7 @@ $(function(){
 
       switch(KEY_CODE[e.which].action){
         case "up":
-          if (game[ KEY_CODE[e.which].player ].up == false){
+          if (game[KEY_CODE[e.which].player].up == false){
             game[ KEY_CODE[e.which].player ].up = true;
             game.p1.position.x = $("#" + KEY_CODE[e.which].player ).offset().left;
             game.p1.position.y = $("#" + KEY_CODE[e.which].player ).offset().top;
@@ -122,9 +122,4 @@ $(function(){
     // };
   });
 
-
-    // if (e.which == 32){
-    //   clearInterval(ballTimer);
-    //   clearInterval(trajTimer);
-    // };
 });

@@ -44,36 +44,28 @@ Player.prototype.unifyPlayer = function(){
 var curr;
 var jumpUp = {"p1": null, "p2":null};
 function jumpEvent (curr_player){
-  game[curr_player].t_p = 0;
+  // game[curr_player].t_p = 0;
   curr = curr_player;
+  console.log(game[curr_player]);
   game[curr_player].init_pos.x = game[curr_player].position.x;
-  jumpUp[curr_player] = setInterval(everyJump, 10);
   game[curr_player].init_pos.y = game[curr_player].position.y;
+  jumpUp[curr_player] = setInterval(everyJump, 10);
 }
 
 function everyJump (){
-  game[curr].t_p += 0.2;
-  // console.log(game[curr].position);
-  // if (game[curr].position.x == 0){
-  //   console.log(game[curr]);
-  // }
-  // if (game[curr].position.y >= game[curr].init_pos.y){
-
-  // if ($("#" + curr).offset().top - game[curr].dimension.height -2>= game[curr].thresholdLevel){
+  game[curr].t_p += 0.05;
   var tmpvalue = $("#" + curr).offset().top - game[curr].dimension.height;
-  if (tmpvalue >= game[curr].thresholdLevel){
-    // console.log($("#" + curr).offset().top );
+  // console.log(game.thresholdLevel);
+
+  if (tmpvalue >= game.thresholdLevel){
     clearInterval(jumpUp[curr]);
-    // console.log(game[curr].thresholdLevel);
     game[curr].t_p = 0;
     game[curr].up = false;
-    // game[curr].init_pos.x = $("#" + curr).offset().top - game[curr].dimension.height;
     game[curr].position.y = tmpvalue;
   };
   game[curr].position.x = game[curr].init_pos.x + game[curr].traj.velocity.x * game[curr].t_p;
   game[curr].position.y = game[curr].init_pos.y + game[curr].traj.velocity.y * game[curr].t_p + 0.5 * game[curr].g * Math.pow(game[curr].t_p, 2);
   game[curr].updatePos();
-  // if (game[curr].position.y - game[curr].dimension.height>= game[curr].thresholdLevel){
 }
 
 

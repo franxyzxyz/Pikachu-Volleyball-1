@@ -28,10 +28,41 @@ Ball.prototype.initialize = function(game){
   this.position.y = 0;
 }
 
-function resetBounceTimer (){
-  ballTimer = setInterval(resetBounceRules,10);
+function setBounceTimer(){
+  ballTimer = setInterval(bounceRules,10);
 };
 
+function bounceRules(){
+  if (game.ball.position.x <= 0 + game.COURT_LIMIT.x){
+      game.ball.velocity.x *= -1;
+      game.ball.position.x += 10;
+  }else if(game.ball.position.x >= game.COURT_LIMIT.x + game.COURT_SIZE.width){
+      game.ball.velocity.x *= -1;
+      game.ball.position.x -=10;
+  };
+  if (game.ball.position.y <= 0 + game.COURT_LIMIT.y){
+      game.ball.velocity.y *= -1;
+      game.ball.position.y +=10;
+  }else if(game.ball.position.y >= game.COURT_LIMIT.y + game.COURT_SIZE.height - game.ball.ballRadius){
+      game.ball.velocity.y *= -1;
+      game.ball.position.y -= 10;
+      addPoint();
+      clearInterval(ballTimer);
+  };
+
+  if (hitRadius(game.ball.radiusRange) !== undefined){
+    game.ball.velocity.x *= -1;
+    game.ball.velocity.y *= -1;
+  };
+
+  game.ball.position.x += game.ball.velocity.x * game.ball.dt;
+  game.ball.position.y += game.ball.velocity.y * game.ball.dt;
+
+  game.ball.updatePos();
+}
+function resetBounceTimer (){
+  ballTimer2 = setInterval(resetBounceRules,10);
+};
 
 function setTrajTimer (){
   game.ball.t = 0;
@@ -54,10 +85,10 @@ function resetBounceRules (){
   }else if(game.ball.position.y >= game.COURT_LIMIT.y + game.COURT_SIZE.height - game.ball.ballRadius){
     game.ball.velocity.y *= -1;
     game.ball.position.y -=5;
-    clearInterval(ballTimer);
+    addPoint();
+    clearInterval(ballTimer2);
     // console.log(game.SCORE_TAKER);
     // game[game.SCORE_TAKER].score++;
-    addPoint();
     // console.log(game[game.SCORE_TAKER].score);
   };
   if (hitRadius(game.ball.radiusRange) !== undefined){
@@ -65,15 +96,12 @@ function resetBounceRules (){
     game.ball.velocity.y *= -1;
   };
 
-  game.ball.position.x += game.ball.velocity.x * game.ball.dt;
+  game.ball.position.x +=game.ball.velocity.x * game.ball.dt;
   game.ball.position.y += game.ball.velocity.y * game.ball.dt;
 
   game.ball.updatePos(); // Associated with setBounceTimer
 }
 
-function setBounceTimer(){
-  ballTimer = setInterval(bounceRules,10);
-};
 
 function initTrajectory (trajElement){
   //input from hitRadius as an object traj_XY.x traj_XY.y
@@ -99,19 +127,18 @@ function trajectory (){
   game.ball.updatePos();
 
   if (checkGround()){
+    addPoint();
     clearInterval(trajTimer);
     // game[game.SCORE_TAKER].score++;
-    addPoint();
   };
   if (checkBoundary()){
-    clearInterval(trajTimer);
     game.ball.t = 0;
     game.ball.velocity.x *= 0.2;
     game.ball.velocity.y *= 0.2;
     resetBounceTimer();
+    clearInterval(trajTimer);
   } // Associated with setTrajTimer
 }
-
 
 Ball.prototype.unifyPosition = function(){
   var tmp = {};
@@ -119,35 +146,6 @@ Ball.prototype.unifyPosition = function(){
   tmp.y = this.position.y + this.ballRadius * 0.5;
   return tmp;
 };
-
-function bounceRules(){
-  if (game.ball.position.x <= 0 + game.COURT_LIMIT.x){
-      game.ball.velocity.x *= -1;
-      game.ball.position.x += 10;
-  }else if(game.ball.position.x >= game.COURT_LIMIT.x + game.COURT_SIZE.width){
-      game.ball.velocity.x *= -1;
-      game.ball.position.x -=10;
-  };
-  if (game.ball.position.y <= 0 + game.COURT_LIMIT.y){
-      game.ball.velocity.y *= -1;
-      game.ball.position.y +=10;
-  }else if(game.ball.position.y >= game.COURT_LIMIT.y + game.COURT_SIZE.height - game.ball.ballRadius){
-      game.ball.velocity.y *= -1;
-      game.ball.position.y -= 10;
-      clearInterval(ballTimer);
-      addPoint();
-  };
-  if (hitRadius(game.ball.radiusRange) !== undefined){
-    game.ball.velocity.x *= -1;
-    game.ball.velocity.y *= -1;
-  };
-
-  game.ball.position.x += game.ball.velocity.x * game.ball.dt;
-  game.ball.position.y += game.ball.velocity.y * game.ball.dt;
-
-  game.ball.updatePos(); // Associated with setBounceTimer
-
-}
 
 Ball.prototype.updatePos = function(){
   $(this.idName).offset({
