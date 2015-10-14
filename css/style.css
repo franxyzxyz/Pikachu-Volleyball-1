@@ -8,7 +8,7 @@ section > *{
 .halfcourt{
   height:580px;
   width:390px;
-  border:1px solid red;
+  border:0px solid red;
   vertical-align: bottom;
   /*background:red;*/
 }
@@ -24,7 +24,14 @@ section > *{
 
 #p1,#p2{
   width:120px;
+  /*background:black;*/
 }
-#pokeball{
+#pika{
   width:80px;
+}
+
+.score{
+  font-size: 70px;
+  font-weight: bold;
+  color: #f93738;
 }

@@ -9,18 +9,21 @@
 <body>
 
 <header>
-<!-- <h1 class="text-center">Pikachu VolleyBall</h1> -->
+<h1 class="text-center">Pikachu VolleyBall</h1>
 </header>
 
 <section id="court" class="text-center center-block">
   <div id="player1" class="halfcourt">
-    <img id="pika" class="fetchPosition" src="img/pokeball.png"/>
+    <div id="p1_score" class="score">0</div>
+    <img id="pika" class="fectchPosition" src="img/pokeball.png"/>
     <img id="p1" class="fetchPosition" src="img/playerLeft.png" />
 
   </div>
   <div id="player2" class="halfcourt">
+    <div id="p2_score" class="score">0</div>
     <img id="p2" class="fetchPosition" src="img/playerRight.png" />
   </div>
+  <div id="threshold" style="top:300px,left:200px,width:400px,height:2px,background:red"></div>
 </section>
 
 <section id="menu" class="text-center">
@@ -32,6 +35,8 @@
 <script src="js/jquery.min.js"></script>
 <script src="js/app_edit.js"></script>
 <script src="js/game_edit.js"></script>
+<script src="js/ball.js"></script>
+<script src="js/player.js"></script>
 <!-- <script src="js/app.js"></script> -->
 <!-- <script src="js/app_additional.js"></script>
  --></body>
