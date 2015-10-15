@@ -1,113 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Pikachu Volleyball - ver.0.0</title>
- <link rel="stylesheet" href="css/bootstrap.min.css" />
-  <link rel="stylesheet" href="css/style.css" />
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8">
+    <title>Pikachu Volleyball - ver.0.0</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header></header>
+    <section id="court" class="text-center center-block">
+      <div id="player1" class="halfcourt">
+        <div id="p1_score" class="score">0</div>
+        <img id="pika" class="fectchPosition" src="img/pokeball.png"/>
+        <img id="p1" class="fetchPosition" src="img/playerLeft.png" />
 
-<header>
-<!-- <h1 class="text-center">PIKACHU VOLLEYBALL</h1> -->
-<!-- <img src="img/header.png" alt=""> -->
-</header>
+      </div>
+      <div id="player2" class="halfcourt">
+        <div id="p2_score" class="score">0</div>
+        <img id="p2" class="fetchPosition" src="img/playerRight.png" />
+      </div>
+      <div id="threshold" style="top:300px,left:200px,width:400px,height:2px,background:red"></div>
+      <div id="countdown"></div>
+    </section>
+    <section id="warning">
+      <div class="text-center center-block">
+      <span class="label label-warning"><img src="img/warning.png" style="height:30px">WARNING: PLEASE DO NOT CHANGE THE WINDOW SIZE DURING THE GAME. IT MIGHT BREAK THE GAME</span>
+      </div>
+    </section>
+    <section id="menu" class="text-center">
+    </section>
+    <section id="instruction" class="text-center center-block">
+      <div id="method" style="background:url('img/header.png') no-repeat;margin-left:50px">
+        <div id="logo">
+          <img src="img/pikachu.png">
+        </div>
+        <div id="keyboard1">
+          <table>
+            <tr>
+              <td></td><td class="userJUMP">W</td><td></td>
+            </tr>
+            <tr>
+              <td class="userLEFT">A</td><td></td><td class="userRIGHT">D</td>
+            </tr>
+          </table>
+          <table id="instr_p1">
+            <tr >
+              <td class="userSPIKE">SPACE</td>
+            </tr>
+            <tr>
+              <td class="playerCell">PLAYER 1</td>
+            </tr>
+          </table>
+        </div>
+        <div id="keyboard2">
+          <table>
+            <tr>
+              <td></td><td class="userJUMP">▲</td><td></td>
+            </tr>
+            <tr>
+              <td class="userLEFT">◄</td><td></td><td class="userRIGHT">►</td>
+            </tr>
+          </table>
+          <table id="instr_p2">
+            <tr >
+              <td class="userSPIKE">RETURN</td>
+            </tr>
+            <tr>
+              <td class="playerCell">PLAYER 2</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div id="animation">
+        <img src="img/start.png" id="starterImage">
+      </div>
+      <div>
+        <button id="start" class="gameBtn" type="button">START THE GAME</button>
+      </div>
+    </section>
+    <section id="gameOver" class="text-center center-block">
+      <div>
+        <img src="img/gameover.png"><br/><br/>
+        <button class="gameBtn" id="restart">RESTART</button>
+      </div>
+    </section>
 
-<section id="court" class="text-center center-block">
-  <div id="player1" class="halfcourt">
-    <div id="p1_score" class="score">0</div>
-    <img id="pika" class="fectchPosition" src="img/pokeball.png"/>
-    <img id="p1" class="fetchPosition" src="img/playerLeft.png" />
-
-  </div>
-  <div id="player2" class="halfcourt">
-    <div id="p2_score" class="score">0</div>
-    <img id="p2" class="fetchPosition" src="img/playerRight.png" />
-  </div>
-  <div id="threshold" style="top:300px,left:200px,width:400px,height:2px,background:red"></div>
-  <div id="countdown"></div>
-</section>
-
-<section id="warning">
-  <div class="text-center center-block">
-  <span class="label label-warning"><img src="img/warning.png" style="height:30px">WARNING: PLEASE DO NOT CHANGE THE WINDOW SIZE DURING THE GAME. IT MIGHT BREAK THE GAME</span>
-  </div>
-</section>
-
-<section id="menu" class="text-center">
-</section>
-
-<section id="instruction" class="text-center center-block">
-
-
-  <div id="method" style="background:url('img/header.png') no-repeat;margin-left:50px">
-    <div id="logo">
-      <img src="img/pikachu.png">
+    <div id="userGuide">
+      <span></span>
     </div>
-    <div id="keyboard1">
-      <table>
-        <tr>
-          <td></td><td class="userJump">W</td><td></td>
-        </tr>
-        <tr>
-          <td class="userLeft">A</td><td></td><td class="userRight">D</td>
-        </tr>
-      </table>
-      <table id="instr_p1">
-        <tr >
-          <td class="userHit">SPACE</td>
-        </tr>
-        <tr>
-          <td class="playerCell">PLAYER 1</td>
-        </tr>
-      </table>
-    </div>
 
-    <div id="keyboard2">
-      <table>
-        <tr>
-          <td></td><td class="userJump">▲</td><td></td>
-        </tr>
-        <tr>
-          <td class="userLeft">◄</td><td></td><td class="userRight">►</td>
-        </tr>
-      </table>
-      <table id="instr_p2">
-        <tr >
-          <td class="userHit">RETURN</td>
-        </tr>
-        <tr>
-          <td class="playerCell">PLAYER 2</td>
-        </tr>
-      </table>
-    </div>
-  </div>
-
-  <div id="animation">
-    <img src="img/start.png" id="starterImage">
-  </div>
-
-  <div>
-    <button id="start" class="gameBtn" type="button">START THE GAME</button>
-  </div>
-</section>
-
-<section id="gameOver" class="text-center center-block">
-  <div>
-    <img src="img/gameover.png"><br/><br/>
-    <button class="gameBtn" id="restart">RESTART</button>
-  </div>
-</section>
-
-<div id="userGuide">
-  <span>RETURN</span>
-</div>
-
-<script src="js/jquery.min.js"></script>
-<script src="js/jBeep.min.js"></script>
-<script src="js/app.js"></script>
-<script src="js/game.js"></script>
-<script src="js/ball.js"></script>
-<script src="js/player.js"></script>
- --></body>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jBeep.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/ball.js"></script>
+    <script src="js/player.js"></script>
+  </body>
 </html>
