@@ -1,43 +1,30 @@
 var game;
 $(function(){
   game = new Game();
-  //Initialize
   game.initialize();
-  //Register Event for Keys
-  var KEY_CODE = {
-    // LEFT
-    87: { action: "up", player: "p1", on: false },
-    65: { action: "left", player: "p1", on: false },
-    68: { action: "right", player: "p1", on: false },
-    32: { action: "hit", player: "p1", on: false },
-    // RIGHT
-    38: { action: "up", player: "p2", on: false },
-    37: { action: "left", player: "p2", on: false },
-    39: { action: "right", player: "p2", on: false },
-    13: { action: "hit", player: "p2", on: false },
-  };
 
+  var KEY_CODE = {
+    87: { action: "up", player: "p1" },
+    65: { action: "left", player: "p1" },
+    68: { action: "right", player: "p1" },
+    32: { action: "hit", player: "p1" },
+    38: { action: "up", player: "p2" },
+    37: { action: "left", player: "p2" },
+    39: { action: "right", player: "p2" },
+    13: { action: "hit", player: "p2" },
+  };
+  // INITALIZE PAGE KEY HOVER EVENTS
   function guideOffHover(){
     $("#userGuide").css({'z-index':-2});
   }
 
-  $("td.userJump").hover(function(){
+$("td").hover(function(){
+  if ($(this).attr('class') !== undefined && $(this).attr('class') !== 'playerCell'){
+    var opsName = $(this).attr('class').split("user")[1]
     $("#userGuide").css({'z-index':2})
-    .html("<span>" + "JUMP" + "</span>")
-  },guideOffHover);
-  $("td.userLeft").hover(function(){
-    $("#userGuide").css({'z-index':2})
-    .html("<span>" + "LEFT" + "</span>")
-  },guideOffHover);
-  $("td.userRight").hover(function(){
-    $("#userGuide").css({'z-index':2})
-    .html("<span>" + "RIGHT" + "</span>")
-  },guideOffHover);
-  $("td.userHit").hover(function(){
-    $("#userGuide").css({'z-index':2})
-    .html("<span>" + "SPIKE!" + "</span>")
-  },guideOffHover);
-
+    .html("<span>" + opsName + "</span>");
+  };
+},guideOffHover);
 
   $("#instruction").offset({
     top: $("#court").offset().top,
@@ -57,20 +44,18 @@ $(function(){
       },500)});
     if (count>10 || game.START){clearInterval(animateTimer)}
   };
-
   $("#pika").css({opacity:0});
   $("#start").on("click",initiate);
 
-    myAudio = new Audio('./audio/bg.wav');
-    myAudio.addEventListener('ended', function() {
-        this.currentTime = 0;
-        this.play();
-    }, false);
+  myAudio = new Audio('./audio/bg.wav');
+  myAudio.addEventListener('ended', function() {
+      this.currentTime = 0;
+      this.play();
+  }, false);
 
   function initiate(){
     $("#instruction").css({'z-index':-1})
     myAudio.play();
-
     $( "#court" ).animate({
       opacity: 1
     }, 1000);
@@ -90,38 +75,27 @@ $(function(){
     };
   };
 
+  adjustHiddenDivision("countdown");
+  adjustHiddenDivision("gameOver");
+
+  function adjustHiddenDivision(name){
+    var topLevel = Math.max(0, (($(window).height() - $($("#" + name)).outerHeight()) / 4) +
+       $(window).scrollTop()) + "px";
+    var leftLevel = Math.max(0, (($(window).width() - $($("#" + name)).outerWidth()) / 2.3) +
+      $(window).scrollLeft()) + "px";
+
+      $("#" + name).css("position","absolute");
+      $("#" + name).css("top", topLevel);
+      $("#" + name).css("left", leftLevel);
+  }
+  $( window ).resize(function() {
     adjustHiddenDivision("countdown");
     adjustHiddenDivision("gameOver");
-
-    function adjustHiddenDivision(name){
-      var topLevel = Math.max(0, (($(window).height() - $($("#" + name)).outerHeight()) / 4) +
-         $(window).scrollTop()) + "px";
-      var leftLevel = Math.max(0, (($(window).width() - $($("#" + name)).outerWidth()) / 2.3) +
-        $(window).scrollLeft()) + "px";
-
-        $("#" + name).css("position","absolute");
-        $("#" + name).css("top", topLevel);
-        $("#" + name).css("left", leftLevel);
-    }
-
-    $( window ).resize(function() {
-      adjustHiddenDivision("countdown");
-      adjustHiddenDivision("gameOver");
-    });
-
-  // $("#test").offset({
-  //   top: game.COURT_LIMIT.y + game.COURT_SIZE.height - game.NET_HEIGHT,
-  //   left:game.COURT_LIMIT.x + game.COURT_SIZE.width/2 - game.NET_WIDTH/2
-  // })
+  });
 
   Object.observe(game.ball.position, function(changes) {
     playerTurn(game.ball.position.x);
     if (touchNet()){
-      // timerList.forEach(function(e){
-      //   clearInterval(e);
-      //   removeTimer(e);
-      //   // addPoint();
-      // })
       jBeep("./audio/smash.wav");
       clearInterval(ballTimer2);
       clearInterval(ballTimer);
@@ -131,12 +105,11 @@ $(function(){
     };
   });
 
-  var sideOps = {
-    p1: game.ball.ballRadius,
-    p2: 0
-  };
-
   function touchNet(){
+    var sideOps = {
+      p1: game.ball.ballRadius,
+      p2: 0
+    };
     var increment = sideOps[game.CURRENT_PLAYER];
     var lowerLimit = game.COURT_LIMIT.x + game.COURT_SIZE.width/2 - game.NET_WIDTH/2 - increment;
     var upperLimit = game.COURT_LIMIT.x + game.COURT_SIZE.width/2 + game.NET_WIDTH/2 - increment;
@@ -157,6 +130,7 @@ $(function(){
     }
   };
 
+  // HORIZONTAL LIMITATION FOR PLAYER //
   function is_x_out_LEFT(player){
     switch(player){
       case "p1":
@@ -185,6 +159,7 @@ $(function(){
         break;
     }
   }
+  // VERTICAL LIMITATION FOR PLAYER //
   function is_y_out(player){
     if ($("#" + player).offset().top >= game.COURT_SIZE.height - this.dimension.height - 50 + game.COURT_LIMIT.y){
       return true;
@@ -192,10 +167,7 @@ $(function(){
   }
 
   $(document).keydown(function(e){
-    // 1. Key Code + CurrentPlayer
     if (e.which in KEY_CODE){
-      KEY_CODE[e.which].on = true;
-
       switch(KEY_CODE[e.which].action){
         case "up":
           if (game[KEY_CODE[e.which].player].up == false){
@@ -240,17 +212,12 @@ $(function(){
           break;
       }
     };
+  });
 
-    $("#restart").on("click",function(){
-      document.location.reload(true);
-      initiate();
-    });
-
-
-    // if (e.which == 32){
-    //   clearInterval(ballTimer);
-    //   clearInterval(trajTimer);
-    // };
+  // REIGSTER GAME OVER RE-START COMMAND
+  $("#restart").on("click",function(){
+    document.location.reload(true);
+    initiate();
   });
 
 });
