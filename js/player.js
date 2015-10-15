@@ -17,6 +17,18 @@ var Player = function(){
   this.touch = 0;
 };
 
+var curr;
+var tmpArray = {
+  p1: {
+    prev: {x: null, y:null},
+    curr: {x: null, y:null}
+  },
+  p2: {
+    prev: {x: null, y:null},
+    curr: {x: null, y:null}
+  }
+};
+
 // Player [METHODS] //
 Player.prototype.initialize = function(game, name,divOffset){
   this.name = name;
@@ -30,7 +42,12 @@ Player.prototype.initialize = function(game, name,divOffset){
   };
   this.updatePos();
 };
-
+Player.prototype.updatePos = function(){
+  $("#" + this.name).offset({
+    left: this.position.x,
+    top: this.position.y
+  });
+};
 Player.prototype.unifyPlayer = function(){
   var tmp = $("#" + this.name);
   this.position.y = tmp.offset().top + this.dimension.height * 0.5;
@@ -40,8 +57,6 @@ Player.prototype.unifyPlayer = function(){
     this.position.x = tmp.offset().left + this.dimension.width * 0.2;
   };
 };
-
-var curr;
 function jumpEvent (curr_player){
   curr = curr_player;
   game[curr_player].init_pos.x = game[curr_player].position.x;
@@ -49,29 +64,19 @@ function jumpEvent (curr_player){
   timerList.push("jumpUp");
   jumpUp = setInterval(everyJump, 10);
 }
-var tmpArray = {
-  p1: {
-    prev: {x: null, y:null},
-    curr: {x: null, y:null}
-  },
-  p2: {
-    prev: {x: null, y:null},
-    curr: {x: null, y:null}
-  }
-}
 function everyJump (){
   if (game[curr].t_p !== 0){
     tmpArray[curr].prev.x = tmpArray[curr].curr.x;
     tmpArray[curr].prev.y = tmpArray[curr].curr.y;
     var tmpvalue = $("#" + curr).offset().top - game[curr].dimension.height;
     if (tmpArray[curr].prev.y >= game.thresholdLevel + 5){
-        game[curr].t_p = 0;
-        game[curr].up = false;
-        game[curr].position.y = game.thresholdLevel - 5;
-        removeTimer(jumpUp);
-        clearInterval(jumpUp);
-        game[curr].t_p -=0.25;
-        game[curr].up = false;
+      game[curr].t_p = 0;
+      game[curr].up = false;
+      game[curr].position.y = game.thresholdLevel - 5;
+      removeTimer(jumpUp);
+      clearInterval(jumpUp);
+      game[curr].t_p -=0.25;
+      game[curr].up = false;
     }
   }
   game[curr].t_p += 0.25;
@@ -83,9 +88,4 @@ function everyJump (){
   game[curr].updatePos();
 }
 
-Player.prototype.updatePos = function(){
-  $("#" + this.name).offset({
-    left: this.position.x,
-    top: this.position.y
-  });
-};
+
