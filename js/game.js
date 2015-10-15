@@ -2,7 +2,7 @@ var jumpUp, trajTimer, ballTimer, ballTimer2;
 var timerList = [];
 
 var Game = function(){
-  this.MAX_POINT = 2;
+  this.MAX_POINT = 21;
   // this.SERVE = null; // randomize the start of first Server [ADD LATER] : prototype of Game
   this.COURT_SIZE = { width: 800, height: 600}; // width-height
   this.START = false;
