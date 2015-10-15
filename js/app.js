@@ -200,8 +200,8 @@ $(function(){
         case "up":
           if (game[KEY_CODE[e.which].player].up == false){
             game[ KEY_CODE[e.which].player ].up = true;
-            game.p1.position.x = $("#" + KEY_CODE[e.which].player ).offset().left;
-            game.p1.position.y = $("#" + KEY_CODE[e.which].player ).offset().top;
+            game[ KEY_CODE[e.which].player ].position.x = $("#" + KEY_CODE[e.which].player ).offset().left;
+            game[ KEY_CODE[e.which].player ].position.y = $("#" + KEY_CODE[e.which].player ).offset().top;
             jumpEvent(KEY_CODE[e.which].player);
           }
           break;
