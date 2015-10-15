@@ -42,17 +42,13 @@ Player.prototype.unifyPlayer = function(){
 };
 
 var curr;
-// var jumpUp = {"p1": null, "p2":null};
 function jumpEvent (curr_player){
-  // game[curr_player].t_p = 0;
   curr = curr_player;
-  // console.log(game[curr_player]);
   game[curr_player].init_pos.x = game[curr_player].position.x;
   game[curr_player].init_pos.y = game[curr_player].position.y;
   timerList.push("jumpUp");
   jumpUp = setInterval(everyJump, 10);
 }
-
 var tmpArray = {
   p1: {
     prev: {x: null, y:null},
@@ -62,7 +58,6 @@ var tmpArray = {
     prev: {x: null, y:null},
     curr: {x: null, y:null}
   }
-
 }
 function everyJump (){
   if (game[curr].t_p !== 0){
@@ -85,31 +80,8 @@ function everyJump (){
   tmpArray[curr].curr.x = game[curr].position.x;
   game[curr].position.y = game[curr].init_pos.y + game[curr].traj.velocity.y * game[curr].t_p + 0.5 * game[curr].g * Math.pow(game[curr].t_p, 2);
   tmpArray[curr].curr.y = game[curr].position.y;
-
-  // if (tmpvalue >= game.thresholdLevel){
-  //   game[curr].t_p = 0;
-  //   game[curr].up = false;
-  //   game[curr].position.y = tmpvalue;
-  //   removeTimer(jumpUp);
-  //   clearInterval(jumpUp);
-  // };
   game[curr].updatePos();
 }
-// function everyJump (){
-//   game[curr].t_p += 0.05;
-//   var tmpvalue = $("#" + curr).offset().top - game[curr].dimension.height;
-//   game[curr].position.x = game[curr].init_pos.x + game[curr].traj.velocity.x * game[curr].t_p;
-//   game[curr].position.y = game[curr].init_pos.y + game[curr].traj.velocity.y * game[curr].t_p + 0.5 * game[curr].g * Math.pow(game[curr].t_p, 2);
-
-//   if (tmpvalue >= game.thresholdLevel){
-//     game[curr].t_p = 0;
-//     game[curr].up = false;
-//     game[curr].position.y = tmpvalue;
-//     removeTimer(jumpUp);
-//     clearInterval(jumpUp);
-//   };
-//   game[curr].updatePos();
-// }
 
 Player.prototype.updatePos = function(){
   $("#" + this.name).offset({
