@@ -18,13 +18,13 @@ $(function(){
     $("#userGuide").css({'z-index':-2});
   }
 
-$("td").hover(function(){
-  if ($(this).attr('class') !== undefined && $(this).attr('class') !== 'playerCell'){
-    var opsName = $(this).attr('class').split("user")[1]
-    $("#userGuide").css({'z-index':2})
-    .html("<span>" + opsName + "</span>");
-  };
-},guideOffHover);
+  $("td").hover(function(){
+    if ($(this).attr('class') !== undefined && $(this).attr('class') !== 'playerCell'){
+      var opsName = $(this).attr('class').split("user")[1]
+      $("#userGuide").css({'z-index':2})
+      .html("<span>" + opsName + "</span>");
+    };
+  },guideOffHover);
 
   $("#instruction").offset({
     top: $("#court").offset().top,
@@ -93,6 +93,7 @@ $("td").hover(function(){
     adjustHiddenDivision("gameOver");
   });
 
+  // OPERATIONS TO CHECK THE POSITION OF BALL
   Object.observe(game.ball.position, function(changes) {
     playerTurn(game.ball.position.x);
     if (touchNet()){
