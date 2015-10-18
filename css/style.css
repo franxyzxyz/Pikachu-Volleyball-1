@@ -2,15 +2,17 @@ body{
   background:black;
   overflow-y: hidden
 }
-
 section > *{
   display:inline-block;
-/*  vertical-align:top;*/
 }
-header *{
-  color:#333;
-  text-shadow: 2px 2px #fff;
- -webkit-text-stroke: 1px #ff0000;
+header {
+  margin-top:30px;
+}
+#NET{
+  height:200px;
+  width:4px;
+  background:white;
+  border: 1px solid #333;
 }
 .halfcourt{
   height:580px;
@@ -20,29 +22,46 @@ header *{
   /*background:red;*/
 }
 #court{
-  margin-top:50px;
+  margin-top:20px;
   padding-top:10px;
   padding-bottom:10px;
   width:800px;
-  height:600px;
-  border:2px solid #fff;
+  height:500px;
+  border:0px solid #fff;
   border-radius:10px;
-  background:url('../img/court.jpg');
-  opacity:0;
+  background:url('../img/pikucanvas-web.jpg') bottom;
 }
 #p1,#p2{
   width:120px;
+  /*z-index:20;*/
   /*background:black;*/
 }
 #pika{
   width:80px;
 }
+#max_point{
+  width:180px;
+  height:50px;
+  font-size:20px;
+  text-align:center;
+  border-radius:5px;
+  border:0px solid black;
+  font-weight:bold;
+  background:#edf04a;
+}
+#container{
+  position:relative;
+  width:800px;
+  height:500px;
+}
 #gameOver{
-  margin-top:50px;
+  position:absolute;
+  top:0;
+  left:0;
   padding-top:200px;
   padding-bottom:10px;
   width:800px;
-  height:600px;
+  height:500px;
   z-index:-2;
 }
 #instruction{
@@ -50,11 +69,14 @@ header *{
   padding-top:50px;
   z-index:1;
   width:800px;
-  height:600px;
+  height:500px;
   background:white;
   font-size:50px;
   vertical-align:center;
-  background-image:url('../img/court.jpg');
+  background:url('../img/pikucanvas-web.jpg') bottom;
+  position:absolute;
+  top:0;
+  left:0;
 }/*
 #instruction >:first-child{
   margin-top:80px;
@@ -69,6 +91,7 @@ header *{
   color: #f93738;
   text-shadow: 2px 2px #333333;
   -webkit-text-stroke: 1px #fff;
+  padding-bottom:260px;
 }
 #method{
   background:url('img/header.png') no-repeat;
@@ -94,13 +117,13 @@ header *{
   font-size: 250px;
   font-weight:bold;
   color:#ff0000;
-  position:absolute;
+  /*position:absolute;*/
   /*text-shadow: 2px 2px #fff;*/
   -webkit-text-stroke: 2px #000;
 }
 #animation{
   padding:30px 0;
-  height:160px;
+  height:120px;
   text-align:center;
 }
 table{
@@ -168,4 +191,24 @@ button.gameBtn:hover{
   background:rgba(255,255,255,0.6);
   border-radius:5px;
   padding:5px 20px;
+}
+.boxModal{
+  border-radius:10px;
+  background:#edf04a;
+}
+.titleModal{
+  border-radius:10px;
+  /*background:#edf04a;*/
+  color:#333;
+  font-size:30px;
+  font-weight:bold;
+  padding:5px 20px;
+}
+.textModal{
+  padding:10px 30px;
+  font-size:18px;
+  font-weight:bold;
+}
+#reset{
+  opacity:0;
 }

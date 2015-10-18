@@ -1,91 +1,129 @@
-// Player [PROPERTIES] //
 var Player = function(){
+  this.init_position = {x: null, y: null};
   this.position = { x: null, y: null };
   this.velocity = { x: null, y: null };
-  this.init_pos = { x: null, y: null }; // init JUMP motion
-  this.up = false; // JUMP
-  this.hit = false; // JUMP
-  this.g = 15; // sensitivity of JUMP
-  this.t_p = 0; // JUMP
+  this.init_pos = { x: null, y: null };
+  this.up = false;
+  this.hit = false;
+  this.control = {
+    up: false,
+    hit: false
+  },
+  this.g = 12;
+  this.t = 0;
   this.dimension = { width: 120, height: 85};
   this.name = null;
   this.thresholdLevel = null;
   this.traj = {
-    velocity: { x: 0, y: -100}
+    velocity: { x: 0, y: -90}
   };
   this.score = 0;
   this.touch = 0;
 };
 
-var curr;
-var tmpArray = {
-  p1: {
-    prev: {x: null, y:null},
-    curr: {x: null, y:null}
-  },
-  p2: {
-    prev: {x: null, y:null},
-    curr: {x: null, y:null}
-  }
-};
-
-// Player [METHODS] //
-Player.prototype.initialize = function(game, name,divOffset){
+Player.prototype.initialize = function(parent,name){
   this.name = name;
-  this.thresholdLevel = $("#threshold").offset().top - 50 - (this.dimension.height * 0.7);
-  if (this.name == "p1"){
-    this.position.x = divOffset.left + 80;
-    this.position.y = this.thresholdLevel - 5;
-  }else if (this.name == "p2"){
-    this.position.x = divOffset.left + game.COURT_SIZE.width - this.dimension.width - 80;
-    this.position.y = this.thresholdLevel - 5 ;
+  this.dimension.width = $("#p1").width();
+  this.dimension.height = $("#p1").height();
+  switch(name){
+    case "p1":
+      this.init_position.x = parent.COURT_ORIGIN.x + 100;
+      break;
+    case "p2":
+      this.init_position.x = parent.COURT_ORIGIN.x + parent.COURT_SIZE.width - 100 - this.dimension.width;
+      break;
   };
-  this.updatePos();
-};
-Player.prototype.updatePos = function(){
-  $("#" + this.name).offset({
-    left: this.position.x,
-    top: this.position.y
-  });
-};
-Player.prototype.unifyPlayer = function(){
-  var tmp = $("#" + this.name);
-  this.position.y = tmp.offset().top + this.dimension.height * 0.5;
-  if (this.name == "p1"){
-    this.position.x = tmp.offset().left + this.dimension.width * 0.8;
-  }else if (this.name == "p2"){
-    this.position.x = tmp.offset().left + this.dimension.width * 0.2;
-  };
-};
-function jumpEvent (curr_player){
-  curr = curr_player;
-  game[curr_player].init_pos.x = game[curr_player].position.x;
-  game[curr_player].init_pos.y = game[curr_player].position.y;
-  timerList.push("jumpUp");
-  jumpUp = setInterval(everyJump, 10);
+  this.init_position.y = parent.thresholdLevel;
+
+  this.position.x = this.init_position.x;
+  this.position.y = this.init_position.y;
+
+  this.UPDATE_POSITION();
 }
-function everyJump (){
-  if (game[curr].t_p !== 0){
-    tmpArray[curr].prev.x = tmpArray[curr].curr.x;
-    tmpArray[curr].prev.y = tmpArray[curr].curr.y;
-    var tmpvalue = $("#" + curr).offset().top - game[curr].dimension.height;
-    if (tmpArray[curr].prev.y >= game.thresholdLevel + 5){
-      game[curr].t_p = 0;
-      game[curr].up = false;
-      game[curr].position.y = game.thresholdLevel - 5;
-      removeTimer(jumpUp);
-      clearInterval(jumpUp);
-      game[curr].t_p -=0.25;
-      game[curr].up = false;
-    }
+
+Player.prototype.start_JUMP = function(game){
+  this.control.up = true;
+  this.init_position.x = this.position.x;
+  this.init_position.y = this.position.y;
+  var player_name = this.name;
+  on_TIMER[this.name] = setInterval(function(){
+    JUMP_MOTION(game,player_name)
+  }, 10);
+}
+
+function JUMP_MOTION(parent,player){
+  parent[player].position.x = parent[player].init_position.x + parent[player].traj.velocity.x * parent[player].t;
+  parent[player].position.y = parent[player].init_position.y + parent[player].traj.velocity.y * parent[player].t + 0.5 * parent[player].g * Math.pow(parent[player].t, 2);
+
+  if (parent[player].position.y >= parent.thresholdLevel && parent[player].t !== 0){
+    parent[player].t = 0;
+    parent[player].position.x = parent[player].init_position.x;
+    parent[player].position.y = parent[player].init_position.y;
+    parent[player].UPDATE_POSITION();
+    parent[player].control.up = false;
+    clearInterval(on_TIMER[player]);
+    on_TIMER[player] = null;
+  }else{
+    parent[player].UPDATE_POSITION();
+    parent[player].t += 0.25;
   }
-  game[curr].t_p += 0.25;
-
-  game[curr].position.x = game[curr].init_pos.x + game[curr].traj.velocity.x * game[curr].t_p;
-  tmpArray[curr].curr.x = game[curr].position.x;
-  game[curr].position.y = game[curr].init_pos.y + game[curr].traj.velocity.y * game[curr].t_p + 0.5 * game[curr].g * Math.pow(game[curr].t_p, 2);
-  tmpArray[curr].curr.y = game[curr].position.y;
-  game[curr].updatePos();
 }
 
+Player.prototype.UPDATE_POSITION = function(){
+  $("#" + this.name).offset({
+    top: this.position.y,
+    left: this.position.x
+  })
+}
 
+Player.prototype.adjust_REF = function(){
+  var result = {x: null, y:null};
+  switch(this.name){
+    case "p1":
+      result.x = this.position.x + this.dimension.width * 0.7;
+      result.y = this.position.y + this.dimension.height * 0.5;
+      break;
+    case "p2":
+      result.x = this.position.x + this.dimension.width * 0.3;
+      result.y = this.position.y + this.dimension.height * 0.5;
+      break;
+  }
+  return result;
+};
+
+function RESTRICT_PLAYER (player,direction){
+  //* game.player *//
+  var x = game[player].position.x;
+  var y = game[player].position.y;
+  var result = [];
+
+  switch(game[player].name){
+    case "p1":
+      switch(direction){
+        case "left":
+          if (x <= game.COURT_ORIGIN.x + game.border){
+            return true;
+          }
+          break;
+        case "right":
+          if(x >= game.COURT_ORIGIN.x + game.COURT_SIZE.width / 2 - game[player].dimension.width - game.border){
+            return true;
+          };
+          break;
+      };
+      break;
+    case "p2":
+      switch(direction){
+        case "left":
+          if (x <= game.COURT_ORIGIN.x + game.COURT_SIZE.width / 2 + game.border){
+            return true;
+          }
+          break;
+        case "right":
+          if(x >= game.COURT_ORIGIN.x + game.COURT_SIZE.width - game[player].dimension.width - game.border){
+            return true;
+          };
+          break;
+      }
+  }
+}

@@ -1,109 +1,267 @@
-var jumpUp, trajTimer, ballTimer, ballTimer2;
-var timerList = [];
-var init_traj = {x: null, y:null};
-
 var Game = function(){
   this.MAX_POINT = 21;
-  this.COURT_SIZE = { width: 800, height: 600};
+  this.COURT_SIZE = { width: null, height: null};
   this.START = false;
-  this.COURT_LIMIT = {x: null, y: null};
-  this.CURRENT_PLAYER = null;
+  // this.COURT_LIMIT = {x: null, y: null};
+  this.CURRENT_PLAYER = "p1"; // <-start with P1 DEFAULT
   this.SCORE_TAKER = null;
-  this.NET_HEIGHT = 250;
-  this.NET_WIDTH = 10;
+  this.NET_HEIGHT = 200;
+  this.NET_WIDTH = 2;
+  this.PLAYER_ON_JUMP = false;
   this.p1 = null;
   this.p2 = null;
   this.ball = null;
+  this.SPIKE_MODE = null;
   this.score = {p1: 0, p2:0};
+  this.COURT_ORIGIN = {x: null, y:null},
   this.thresholdLevel = null;
+  this.bounceIncrement = 0;
+  this.border = 5; // border width to check for boundary
 };
 
-// Game METHODS
-Game.prototype.initialize = function(){
+var on_TIMER = {
+  ball: null,
+  p1: null,
+  p2: null,
+  animation: null
+};
+
+Game.prototype.courtSETUP = function(){
+  this.COURT_ORIGIN.x = $("#court").offset().left;
+  this.COURT_ORIGIN.y = $("#court").offset().top;
+  this.COURT_SIZE.width = $("#court").width();
+  this.COURT_SIZE.height = 500;
+  this.thresholdLevel = $("#p1").offset().top;
   this.p1 = new Player();
   this.p2 = new Player();
+  this.p1.initialize(this,"p1");
+  this.p2.initialize(this,"p2");
+}
+
+Game.prototype.initialize = function(){
+  this.p1.initialize(this,"p1");
+  this.p2.initialize(this,"p2");
   this.ball = new Ball();
-  this.p1.initialize(this, "p1",$("#player1").offset());
-  this.p2.initialize(this, "p2",$("#player1").offset());
-  if (this.score.p1 == 0 && this.score.p2 == 0){
-    this.CURRENT_PLAYER = "p1";
-    this.SCORE_TAKER = "p2";
-  };
-  this.COURT_LIMIT = {
-    x: $("#player1").offset().left,
-    y: $("#player1").offset().top
-  };
-  this.ball.initialize(this);
-  this.thresholdLevel = $("#threshold").offset().top - this.p1.dimension.height;
-};
-
-Game.prototype.reInit = function(){
-  this.p1.initialize(this, "p1",$("#player1").offset());
-  this.p2.initialize(this, "p2",$("#player1").offset());
+  this.ball.initialize(this,this[this.CURRENT_PLAYER]);
 }
 
-// Generic functions associated with the game object
-function hitRadius (allowableRadius) {
-  var player = game.CURRENT_PLAYER;
-  game[player].unifyPlayer();
-  var playerPosition = game[player].position;
-  var ballPosition = game.ball.unifyPosition();
-  var radius = Math.sqrt(Math.pow(ballPosition.x - playerPosition.x,2) + Math.pow(ballPosition.y - playerPosition.y,2));
-  if (radius <= allowableRadius){
-    init_traj = {
-      x: ballPosition.x - playerPosition.x,
-      y: ballPosition.y - playerPosition.y
+// Game.prototype.initialize = function(){
+//   if (!this.START) {
+//     // this.START = true;
+//     this.COURT_ORIGIN.x = $("#court").offset().left;
+//     this.COURT_ORIGIN.y = $("#court").offset().top;
+//     this.COURT_SIZE.width = $("#court").width();
+//     this.COURT_SIZE.height = 500;
+//     this.thresholdLevel = $("#p1").offset().top;
+//     this.p1 = new Player();
+//     this.p2 = new Player();
+//     this.p1.initialize(this,"p1");
+//     this.p2.initialize(this,"p2");
+//   };
+//   this.p1.initialize(this,"p1");
+//   this.p2.initialize(this,"p2");
+
+//   this.ball = new Ball();
+//   this.ball.initialize(this,this[this.CURRENT_PLAYER]);
+
+// }
+
+function CHECK_BOUNDARY(){
+  //* game.ball *//
+  var x = game.ball.position.x;
+  var y = game.ball.position.y;
+  var result = [];
+
+  // X BOUNDARY
+  if (x <= game.COURT_ORIGIN.x + game.border){
+    result.push("left-border");
+  }else if (x >= game.COURT_SIZE.width + game.COURT_ORIGIN.x - game.ball.ballRadius - game.border){
+    result.push("right-border");
+  };
+
+  // Y BOUNDARY
+  if (y <= game.COURT_ORIGIN.y + game.border){
+    result.push("top-border");
+  }else if(y >= game.thresholdLevel){ // REMOVE LATER
+    result.push("bottom-border"); // CASE: TOUCH GROUND
+  };
+
+  // WITH PLAYER
+  var hit_target = HIT_RADIUS(90);
+  if (hit_target.target !== null){
+    if (hit_target.x < 0){
+      // ball x < player x
+      result.push("player-at-right");
+    }else if(hit_target.x > 0){
+      result.push("player-at-left");
     };
-    return init_traj // carrying the delta X and delta Y between ball and player
+    if(hit_target.y < 0){
+      result.push("player-at-bottom");
+    }else if(hit_target.y > 0){
+      result.push("player-at-top");
+    }
+    result.push("player");
+  }
+
+  if (game.ball.t !== 0 && result.length !== 0){//TRAJ->BOUNC
+    game.ball.t = 0;
+    SUBSEQUENT_MOTION(result);
+  }else if (result.length !== 0){ //NORMAL BOUNCE
+    SUBSEQUENT_MOTION(result);
+  }
+  return result;
+}
+
+function SUBSEQUENT_MOTION(borderArray){
+  if(borderArray.length !== 0){
+    for (var k=0;k<borderArray.length;k++){
+      switch(borderArray[k]){
+        case "left-border":
+          game.ball.position.x += game.border;
+          game.ball.velocity.x *= -1;
+          break;
+        case "right-border":
+          game.ball.position.x -= game.border;
+          game.ball.velocity.x *= -1;
+          break;
+        case "top-border":
+          game.ball.position.y += game.border;
+          game.ball.velocity.y *= -1;
+          break;
+        case "bottom-border":
+          jBeep("./audio/smash.wav");
+          clearInterval(on_TIMER.ball);
+          lose_ANIMATION();
+          ADD_SCORE();
+          break;
+        case "player":
+          if (game.SPIKE_MODE !== null && game.ball.t == 0){
+            // JUST STARTED TRAJECTORY
+          }
+          game.ball.velocity.y *= -1;
+          game.ball.velocity.x *= -1;
+          break;
+        case "player-at-right":
+          game.ball.position.x -= game.bounceIncrement; // VALUE RELATED TO HIT_RADIUS max allowable radius
+          break;
+        case "player-at-left":
+          game.ball.position.x += game.bounceIncrement;
+          break;
+        case "player-at-bottom":
+          game.ball.position.y -= 5;
+          break;
+        case "player-at-top":
+          game.ball.position.y += 5;
+          break;
+      }
+    };
   }
 }
 
-function addPoint(){
-  game.score[game.SCORE_TAKER]++;  // add point
-  $("#" + game.SCORE_TAKER + "_score").html(game.score[game.SCORE_TAKER]);
-  if (game.score[game.SCORE_TAKER] >= game.MAX_POINT){
-    // END OF GAME -> RETURN SCORE
-    clearInterval(ballTimer2);
-    clearInterval(ballTimer);
-    clearInterval(jumpUp);
-    clearInterval(trajTimer);
+function HIT_RADIUS(maxRadius){
+  var player = ["p1","p2"]
+  var ballPosition = game.ball.adjust_REF();
 
-    $("#gameOver").css({
-      'z-index':1
-    });
-  }else{
-    var nextSERVE = game.SCORE_TAKER;
-    var nextGET = game.CURRENT_PLAYER;
-    clearInterval(ballTimer2);
-    clearInterval(ballTimer);
-    clearInterval(jumpUp);
-    clearInterval(trajTimer);
-    $("#pika").css({opacity:0});
-    game.reInit();
-    game.CURRENT_PLAYER = nextSERVE;
-    game.SCORE_TAKER = nextGET;
-    game.ball.initialize(game);
-    game.ball.velocity = { x: 0, y: -5};
-    $("#pika").css({opacity:0});
-    var countDown = 3;
-    $("#countdown").html(countDown);
-    var countdownTimer = setInterval(function(){
-      countDown--;
-      $("#countdown").html(countDown);
-      if (countDown <= 0){
-        setBounceTimer();
-      $("#countdown").html("");
-        clearInterval(countdownTimer);
-      }},1000);
+  var result = {
+    target: null,
+    x: null,
+    y: null
   };
+
+  player.forEach(function(elem){
+    var playerPosition = game[elem].adjust_REF();
+    var radius = Math.sqrt(Math.pow(ballPosition.x - playerPosition.x,2) + Math.pow(ballPosition.y - playerPosition.y,2));
+
+    if (radius <= maxRadius){
+      result.target = elem;
+      result.x = ballPosition.x - playerPosition.x;
+      result.y = ballPosition.y - playerPosition.y;
+    };
+  })
+  return result;
 }
 
-function playerTurn (ball_x){
-  if (ball_x < (game.COURT_LIMIT.x + game.COURT_SIZE.width) / 2){
-    game.CURRENT_PLAYER = "p1";
-    game.SCORE_TAKER = "p2";
-  } else {
-    game.CURRENT_PLAYER = "p2";
-    game.SCORE_TAKER = "p1";
+function CHECK_NET(){
+  //* game.ball.position *//
+  var x = game.ball.position.x;
+  var y = game.ball.position.y;
+  var result = [];
+
+  var lowerLIMIT = game.COURT_ORIGIN.x + game.COURT_SIZE.width / 2 - game.NET_WIDTH - game.ball.ballRadius/1.5 ;
+  var upperLIMIT = game.COURT_ORIGIN.x + game.COURT_SIZE.width / 2 + game.NET_WIDTH;
+  var netLIMIT = game.COURT_ORIGIN.y + game.COURT_SIZE.height - game.NET_HEIGHT - game.ball.ballRadius;
+
+  var result = {
+    // target: null,
+    x: null,
+    y: null
+  };
+
+  if (x >= lowerLIMIT && x <= upperLIMIT && y >= netLIMIT){
+    clearInterval(on_TIMER.ball);
+    jBeep("./audio/smash.wav");
+    if (game.ball.velocity.x > 0){
+      lose_ANIMATION(200);
+      ADD_SCORE("p1");
+    }else if (game.ball.velocity.x < 0){
+      lose_ANIMATION(350);
+      ADD_SCORE("p2");
+    };
   }
-};
+}
+
+function lose_ANIMATION(limit){
+  $("#pika").animate({
+    top: 0,
+    left: limit
+  },500,function(){
+    $("#pika").animate({
+      top: -20
+    },200,"linear",function(){
+      $("#pika").animate({
+        top: 0
+      },200)
+    });
+  });
+}
+
+function ADD_SCORE(player){
+    switch(player){
+      case "p1":
+        game.score.p2++;
+        game.CURRENT_PLAYER = "p2";
+        break;
+      case "p2":
+        game.CURRENT_PLAYER = "p1";
+        game.score.p1++;
+        break;
+      case undefined: // CASE FROM SUBSEQUENT MOTION
+        if (game.ball.position.x <= game.COURT_ORIGIN.x + game.COURT_SIZE.width / 2 - game.ball.ballRadius){
+          game.CURRENT_PLAYER = "p2";
+          game.score.p2++;
+        } else if (game.ball.position.x >= game.COURT_ORIGIN.x + game.COURT_SIZE.width / 2){
+          game.CURRENT_PLAYER = "p1";
+          game.score.p1++;
+        };
+        break;
+    };
+
+    UPDATE_SCOREBOARD();
+
+    if (game.score.p1 >= game.MAX_POINT || game.score.p2 >= game.MAX_POINT){
+      $("#reset").css({opacity:0});
+      $("#gameOver").css({'z-index':1});
+      clearInterval(on_TIMER.ball);
+    }else{ // START NEW POINT
+      var t = 3;
+      var countdownTIMER = setInterval(function(){
+        $("#countdown").html(t);
+        if (t <= 0){
+          $("#countdown").html("");
+          clearInterval(countdownTIMER);
+          game.initialize();
+        };
+        t--;
+      },1000);
+    }
+}
