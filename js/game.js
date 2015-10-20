@@ -16,6 +16,7 @@ var Game = function(){
   this.COURT_ORIGIN = {x: null, y:null},
   this.thresholdLevel = null;
   this.bounceIncrement = 0;
+  this.onHOLD = false;
   this.border = 5; // border width to check for boundary
 };
 
@@ -44,27 +45,6 @@ Game.prototype.initialize = function(){
   this.ball = new Ball();
   this.ball.initialize(this,this[this.CURRENT_PLAYER]);
 }
-
-// Game.prototype.initialize = function(){
-//   if (!this.START) {
-//     // this.START = true;
-//     this.COURT_ORIGIN.x = $("#court").offset().left;
-//     this.COURT_ORIGIN.y = $("#court").offset().top;
-//     this.COURT_SIZE.width = $("#court").width();
-//     this.COURT_SIZE.height = 500;
-//     this.thresholdLevel = $("#p1").offset().top;
-//     this.p1 = new Player();
-//     this.p2 = new Player();
-//     this.p1.initialize(this,"p1");
-//     this.p2.initialize(this,"p2");
-//   };
-//   this.p1.initialize(this,"p1");
-//   this.p2.initialize(this,"p2");
-
-//   this.ball = new Ball();
-//   this.ball.initialize(this,this[this.CURRENT_PLAYER]);
-
-// }
 
 function CHECK_BOUNDARY(){
   //* game.ball *//
@@ -211,6 +191,7 @@ function CHECK_NET(){
 }
 
 function lose_ANIMATION(limit){
+  // var limit = limit || 0;
   $("#pika").animate({
     top: 0,
     left: limit
@@ -220,9 +201,12 @@ function lose_ANIMATION(limit){
     },200,"linear",function(){
       $("#pika").animate({
         top: 0
-      },200)
+      },200,function(){
+        $("#pika").css('visiblity:hidden');
+      })
     });
   });
+  // $("#pika").css(('visiblity:hidden'));
 }
 
 function ADD_SCORE(player){
@@ -253,15 +237,18 @@ function ADD_SCORE(player){
       $("#gameOver").css({'z-index':1});
       clearInterval(on_TIMER.ball);
     }else{ // START NEW POINT
+      // game.onHOLD = true;
       var t = 3;
       var countdownTIMER = setInterval(function(){
         $("#countdown").html(t);
         if (t <= 0){
           $("#countdown").html("");
           clearInterval(countdownTIMER);
+          clearInterval(on_TIMER.ball);
           game.initialize();
         };
         t--;
       },1000);
+      // game.onHOLD = false;
     }
 }

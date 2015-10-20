@@ -32,38 +32,40 @@ $(function(){
     $(document).keydown(function(e){
       e.preventDefault();
       if (e.which in KEY_CODE){
-        switch(KEY_CODE[e.which].action){
-          case "up":
-            if (game[KEY_CODE[e.which].player].control.up == false){
-              game[KEY_CODE[e.which].player].start_JUMP(game);
-              game[KEY_CODE[e.which].player].UPDATE_POSITION();
-            };
-            break;
-          case "left":
-            if (!RESTRICT_PLAYER(KEY_CODE[e.which].player,KEY_CODE[e.which].action)){
-              game[KEY_CODE[e.which].player].position.x -= 20;
-              game[KEY_CODE[e.which].player].UPDATE_POSITION();
-            }
-            break;
-          case "right":
-            if (!RESTRICT_PLAYER(KEY_CODE[e.which].player,KEY_CODE[e.which].action)){
-              game[KEY_CODE[e.which].player].position.x += 20;
-              game[KEY_CODE[e.which].player].UPDATE_POSITION();
-            };
-            break;
-          case "hit":
-            var hit_target = HIT_RADIUS(130);
-            if (hit_target.target !== null){
-              jBeep("./audio/pi.wav");
-              clearInterval(on_TIMER.ball);
-              spark_effect(hit_target.target);
-              game.SPIKE_MODE = true;
-              game.ball.init_TRAJECTORY(hit_target);
-            };
-            break;
+        // if (game.onHOLD == false){
+          switch(KEY_CODE[e.which].action){
+            case "up":
+              if (game[KEY_CODE[e.which].player].control.up == false){
+                game[KEY_CODE[e.which].player].start_JUMP(game);
+                game[KEY_CODE[e.which].player].UPDATE_POSITION();
+              };
+              break;
+            case "left":
+              if (!RESTRICT_PLAYER(KEY_CODE[e.which].player,KEY_CODE[e.which].action)){
+                game[KEY_CODE[e.which].player].position.x -= 20;
+                game[KEY_CODE[e.which].player].UPDATE_POSITION();
+              }
+              break;
+            case "right":
+              if (!RESTRICT_PLAYER(KEY_CODE[e.which].player,KEY_CODE[e.which].action)){
+                game[KEY_CODE[e.which].player].position.x += 20;
+                game[KEY_CODE[e.which].player].UPDATE_POSITION();
+              };
+              break;
+            case "hit":
+              var hit_target = HIT_RADIUS(130);
+              if (hit_target.target !== null){
+                jBeep("./audio/pi.wav");
+                clearInterval(on_TIMER.ball);
+                spark_effect(hit_target.target);
+                game.SPIKE_MODE = true;
+                game.ball.init_TRAJECTORY(hit_target);
+              };
+              break;
           };
-        };
-      });
+        // };
+      };
+    });
 
   });
 
